@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import LobbyScreen from './components/LobbyScreen';
 import WaitingRoom from './components/WaitingRoom';
+import GameScreen from './components/GameScreen';
 
 export default function App() {
   const [screen, setScreen] = useState('lobby');
@@ -12,9 +13,9 @@ export default function App() {
     setScreen('waiting');
   }
 
-  function handleGameStart({ players }) {
+  function handleGameStart({ code, players }) {
     const role = sessionStorage.getItem('myRole') || 'civilian';
-    setGameData((prev) => ({ ...prev, players }));
+    setGameData((prev) => ({ ...prev, initialCode: code, players }));
     setRoleReveal({ role });
     setScreen('role');
     setTimeout(() => {
@@ -48,7 +49,14 @@ export default function App() {
           onGameStart={handleGameStart}
         />
       )}
-      {screen === 'game' && <p>Game coming soon...</p>}
+      {screen === 'game' && gameData && (
+        <GameScreen
+          roomCode={gameData.roomCode}
+          initialCode={gameData.initialCode}
+          players={gameData.players}
+          myId={gameData.myId}
+        />
+      )}
     </>
   );
 }

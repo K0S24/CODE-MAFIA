@@ -45,7 +45,12 @@ io.on('connection', (socket) => {
     result.players.forEach((player) => {
       io.to(player.id).emit('role_assigned', { role: player.role });
     });
-    io.to(roomCode).emit('game_started', { players: result.players });
+    io.to(roomCode).emit('game_started', { code: result.code, players: result.players });
+  });
+
+  socket.on('code_change', ({ roomCode, code, userId }) => {
+    gameManager.updateCode(roomCode, code);
+    socket.to(roomCode).emit('code_update', { code, userId });
   });
 
   socket.on('disconnect', () => {
