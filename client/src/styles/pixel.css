@@ -1,0 +1,102 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --pixel-red: #FF4444;
+  --pixel-blue: #4488FF;
+  --pixel-green: #44CC44;
+  --pixel-yellow: #FFCC00;
+  --pixel-purple: #CC44FF;
+  --pixel-bg: #0f0f23;
+  --pixel-dark: #1a1a2e;
+  --pixel-darker: #16213e;
+  --pixel-white: #f0f0f0;
+}
+
+body {
+  font-family: 'Press Start 2P', monospace;
+  background-color: var(--pixel-bg);
+  color: var(--pixel-white);
+  min-height: 100vh;
+}
+
+.pixel-btn {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  padding: 12px 20px;
+  border: 4px solid #000;
+  cursor: pointer;
+  text-transform: uppercase;
+  box-shadow: 4px 4px 0px #000;
+  letter-spacing: 1px;
+}
+
+.pixel-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0px #000;
+}
+
+.pixel-btn-yellow { background-color: var(--pixel-yellow); color: #000; }
+.pixel-btn-red    { background-color: var(--pixel-red);    color: #fff; }
+.pixel-btn-green  { background-color: var(--pixel-green);  color: #000; }
+.pixel-btn-blue   { background-color: var(--pixel-blue);   color: #fff; }
+.pixel-btn-gray   { background-color: #444;                color: #fff; }
+
+.pixel-input {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  padding: 10px 12px;
+  background: #111;
+  color: var(--pixel-white);
+  border: 4px solid var(--pixel-yellow);
+  box-shadow: 4px 4px 0px #000;
+  outline: none;
+  width: 100%;
+}
+
+.pixel-input:focus {
+  border-color: var(--pixel-green);
+}
+
+.pixel-panel {
+  background: var(--pixel-darker);
+  border: 4px solid var(--pixel-yellow);
+  box-shadow: 6px 6px 0px #000;
+  padding: 20px;
+}
+
+.pixel-title {
+  font-size: clamp(16px, 4vw, 32px);
+  color: var(--pixel-yellow);
+  text-shadow: 4px 4px 0px #000;
+  letter-spacing: 4px;
+  text-align: center;
+}
+
+.screen {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background-color: var(--pixel-bg);
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-8px); }
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+.bounce { animation: bounce 0.6s ease infinite; }
+.blink  { animation: blink 1s step-end infinite; }
