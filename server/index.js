@@ -59,6 +59,15 @@ io.on('connection', (socket) => {
     io.to(roomCode).emit('chat_update', { userId, username: player.username, message, color: player.color });
   });
 
+  socket.on('cast_vote', ({ roomCode, voterId, targetId }) => {
+    const result = gameManager.castVote(roomCode, voterId, targetId);
+    if (!result) return;
+    io.to(roomCode).emit('vote_result', { eliminated: result.eliminated, wasImposter: result.wasImposter });
+    if (result.gameOver) {
+      io.to(roomCode).emit('game_over', { winner: result.winner, imposter: result.imposter });
+    }
+  });
+
   socket.on('disconnect', () => {
     const info = lobbyManager.removePlayer(socket.id);
     if (info) {
