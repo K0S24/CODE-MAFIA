@@ -3,6 +3,7 @@ const http = require('http');
 const { Server } = require('socket.io');
 const cors = require('cors');
 const lobbyManager = require('./lobbyManager');
+const gameManager = require('./gameManager');
 
 const app = express();
 app.use(cors());
@@ -33,6 +34,18 @@ io.on('connection', (socket) => {
     }
     socket.join(roomCode);
     io.to(roomCode).emit('lobby_update', { players: result.players });
+  });
+
+  socket.on('start_game', ({ roomCode }) => {
+    const result = gameManager.startGame(roomCode, lobbyManager.getLobby(roomCode));
+    if (!result.success) {
+      socket.emit('error', { message: result.message });
+      return;
+    }
+    result.players.forEach((player) => {
+      io.to(player.id).emit('role_assigned', { role: player.role });
+    });
+    io.to(roomCode).emit('game_started', { players: result.players });
   });
 
   socket.on('disconnect', () => {
