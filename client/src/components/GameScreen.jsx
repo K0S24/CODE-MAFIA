@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useSocket } from '../hooks/useSocket';
 import CodeEditor from './CodeEditor';
+import ChatBox from './ChatBox';
 
 export default function GameScreen({ roomCode, initialCode, players, myId }) {
   const [code, setCode] = useState(initialCode);
@@ -25,13 +26,9 @@ export default function GameScreen({ roomCode, initialCode, players, myId }) {
           ROLE: {myRole.toUpperCase()}
         </span>
       </div>
-      <div style={{ flex: 1, overflow: 'hidden' }}>
-        <CodeEditor
-          code={code}
-          onChange={handleCodeChange}
-          players={players}
-          myId={myId}
-        />
+      <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
+        <CodeEditor code={code} onChange={handleCodeChange} players={players} myId={myId} />
+        <ChatBox roomCode={roomCode} myId={myId} />
       </div>
     </div>
   );

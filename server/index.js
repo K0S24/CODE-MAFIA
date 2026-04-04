@@ -53,6 +53,12 @@ io.on('connection', (socket) => {
     socket.to(roomCode).emit('code_update', { code, userId });
   });
 
+  socket.on('chat_message', ({ roomCode, userId, message }) => {
+    const player = lobbyManager.getPlayer(roomCode, userId);
+    if (!player) return;
+    io.to(roomCode).emit('chat_update', { userId, username: player.username, message, color: player.color });
+  });
+
   socket.on('disconnect', () => {
     const info = lobbyManager.removePlayer(socket.id);
     if (info) {
