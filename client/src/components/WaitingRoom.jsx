@@ -12,7 +12,13 @@ export default function WaitingRoom({ roomCode, players: initialPlayers, isHost,
   });
 
   return (
-    <div className="screen">
+    <div className="screen outdoor-screen">
+      <div className="sky-clouds">
+        <div className="pixel-cloud" style={{ width: 100, height: 32, top: '10%', animation: 'cloud-drift 26s linear infinite', animationDelay: '-5s' }} />
+        <div className="pixel-cloud" style={{ width: 72, height: 28, top: '30%', animation: 'cloud-drift 34s linear infinite', animationDelay: '-18s' }} />
+        <div className="pixel-cloud" style={{ width: 112, height: 36, top: '18%', animation: 'cloud-drift 20s linear infinite', animationDelay: '-3s' }} />
+        <div className="pixel-cloud" style={{ width: 60, height: 22, top: '45%', animation: 'cloud-drift 28s linear infinite', animationDelay: '-14s' }} />
+      </div>
       <h1 className="pixel-title" style={{ marginBottom: '8px' }}>WAITING ROOM</h1>
       <p style={{ fontFamily: 'Press Start 2P', fontSize: '20px', color: '#FFCC00', marginBottom: '32px', letterSpacing: '6px' }}>{roomCode}</p>
 

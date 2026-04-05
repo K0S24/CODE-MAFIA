@@ -88,6 +88,68 @@ body {
   background-color: var(--pixel-bg);
 }
 
+/* Outdoor sky scene */
+.outdoor-screen {
+  background: #4488DD;
+  position: relative;
+  overflow: hidden;
+}
+
+.outdoor-screen::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 48px;
+  background: #33AA44;
+  z-index: 1;
+}
+
+.outdoor-screen > * {
+  position: relative;
+  z-index: 2;
+}
+
+.sky-clouds {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.pixel-cloud {
+  position: absolute;
+  background: #f4f4f4;
+  image-rendering: pixelated;
+}
+
+.pixel-cloud::before,
+.pixel-cloud::after {
+  content: '';
+  position: absolute;
+  background: #f4f4f4;
+}
+
+.pixel-cloud::before {
+  width: 50%;
+  height: 100%;
+  top: -60%;
+  left: 15%;
+}
+
+.pixel-cloud::after {
+  width: 35%;
+  height: 80%;
+  top: -45%;
+  right: 15%;
+}
+
+@keyframes cloud-drift {
+  from { transform: translateX(-250px); }
+  to   { transform: translateX(110vw); }
+}
+
 @keyframes bounce {
   0%, 100% { transform: translateY(0); }
   50%       { transform: translateY(-8px); }

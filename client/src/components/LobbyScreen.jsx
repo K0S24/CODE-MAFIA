@@ -30,7 +30,13 @@ export default function LobbyScreen({ onLobbyJoined }) {
   }
 
   return (
-    <div className="screen">
+    <div className="screen outdoor-screen">
+      <div className="sky-clouds">
+        <div className="pixel-cloud" style={{ width: 96, height: 32, top: '12%', animation: 'cloud-drift 22s linear infinite', animationDelay: '0s' }} />
+        <div className="pixel-cloud" style={{ width: 64, height: 24, top: '28%', animation: 'cloud-drift 30s linear infinite', animationDelay: '-12s' }} />
+        <div className="pixel-cloud" style={{ width: 120, height: 36, top: '8%', animation: 'cloud-drift 38s linear infinite', animationDelay: '-22s' }} />
+        <div className="pixel-cloud" style={{ width: 80, height: 28, top: '40%', animation: 'cloud-drift 25s linear infinite', animationDelay: '-8s' }} />
+      </div>
       <h1 className="pixel-title bounce" style={{ marginBottom: '40px' }}>IT MAFIA</h1>
 
       <div className="pixel-panel" style={{ width: '100%', maxWidth: '380px' }}>
