@@ -1,4 +1,4 @@
-# IT MAFIA
+# CODE MAFIA
 
 A multiplayer browser game combining collaborative Python coding with social deception. One player is secretly the **Imposter** – everyone else must catch them before it's too late.
 
