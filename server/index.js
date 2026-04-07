@@ -53,6 +53,10 @@ io.on('connection', (socket) => {
     socket.to(roomCode).emit('code_update', { code, userId });
   });
 
+  socket.on('cursor_move', ({ roomCode, userId, line }) => {
+    socket.to(roomCode).emit('cursor_update', { userId, line });
+  });
+
   socket.on('chat_message', ({ roomCode, userId, message }) => {
     const player = lobbyManager.getPlayer(roomCode, userId);
     if (!player) return;

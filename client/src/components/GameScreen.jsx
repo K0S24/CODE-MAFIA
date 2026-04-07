@@ -11,8 +11,11 @@ export default function GameScreen({ roomCode, initialCode, players, myId, onVot
   const [timeLeft, setTimeLeft] = useState(GAME_DURATION);
   const [showVoting, setShowVoting] = useState(false);
 
+  const [playerCursors, setPlayerCursors] = useState({});
+
   const socket = useSocket({
     code_update: ({ code: newCode }) => setCode(newCode),
+    cursor_update: ({ userId, line }) => setPlayerCursors((prev) => ({ ...prev, [userId]: line })),
     vote_result: (result) => onVoteResult(result),
     game_over: (data) => onGameOver(data),
   });
@@ -30,6 +33,10 @@ export default function GameScreen({ roomCode, initialCode, players, myId, onVot
   function handleCodeChange(newCode) {
     setCode(newCode);
     socket.emit('code_change', { roomCode, code: newCode, userId: myId });
+  }
+
+  function handleCursorChange(line) {
+    socket.emit('cursor_move', { roomCode, userId: myId, line });
   }
 
   const myRole = sessionStorage.getItem('myRole') || 'civilian';
@@ -54,7 +61,7 @@ export default function GameScreen({ roomCode, initialCode, players, myId, onVot
         </button>
       </div>
       <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
-        <CodeEditor code={code} onChange={handleCodeChange} players={players} myId={myId} />
+        <CodeEditor code={code} onChange={handleCodeChange} onCursorChange={handleCursorChange} players={players} myId={myId} playerCursors={playerCursors} />
         <ChatBox roomCode={roomCode} myId={myId} />
       </div>
     </div>

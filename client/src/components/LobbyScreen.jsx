@@ -37,7 +37,7 @@ export default function LobbyScreen({ onLobbyJoined }) {
         <div className="pixel-cloud" style={{ width: 120, height: 36, top: '8%', animation: 'cloud-drift 38s linear infinite', animationDelay: '-22s' }} />
         <div className="pixel-cloud" style={{ width: 80, height: 28, top: '40%', animation: 'cloud-drift 25s linear infinite', animationDelay: '-8s' }} />
       </div>
-      <h1 className="pixel-title bounce" style={{ marginBottom: '40px' }}>IT MAFIA</h1>
+      <h1 className="pixel-title bounce" style={{ marginBottom: '40px' }}>CODE MAFIA</h1>
 
       <div className="pixel-panel" style={{ width: '100%', maxWidth: '380px' }}>
         {!mode ? (
