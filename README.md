@@ -3,7 +3,7 @@
 A multiplayer browser game combining collaborative Python coding with social deception. One player is secretly the **Imposter** – everyone else must catch them before it's too late.
 
 ---
-
+ 
 ## How to Play
 
 1. One player creates a lobby and shares the 4-letter room code
