@@ -15,7 +15,7 @@ A multiplayer browser game combining collaborative Python coding with social dec
 7. The side that outsmarts the other wins
 
 ---
-
+ 
 ## Getting Started
 
 **Requirements:** Node.js installed
