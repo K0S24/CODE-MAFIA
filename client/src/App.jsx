@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useSocket } from './hooks/useSocket';
 import LobbyScreen from './components/LobbyScreen';
 import WaitingRoom from './components/WaitingRoom';
@@ -11,11 +11,22 @@ export default function App() {
   const [gameData, setGameData] = useState(null);
   const [roleReveal, setRoleReveal] = useState(null);
   const [resultData, setResultData] = useState(null);
+  const revealTimerRef = useRef(null);
 
-  useSocket({
+  const socket = useSocket({
     game_over: (data) => {
+      clearTimeout(revealTimerRef.current);
+      setRoleReveal(null);
       setResultData({ ...data, players: gameData?.players });
       setScreen('result');
+    },
+    // registered app-wide so it can't be missed while the role reveal
+    // or any other screen is showing
+    voting_started: () => {
+      setGameData((prev) => (prev ? { ...prev, voting: true } : prev));
+    },
+    game_roster: ({ players }) => {
+      setGameData((prev) => (prev ? { ...prev, players } : prev));
     },
   });
 
@@ -24,23 +35,23 @@ export default function App() {
     setScreen('waiting');
   }
 
-  function handleGameStart({ code, players }) {
+  function handleGameStart({ code, players, duration }) {
     const role = sessionStorage.getItem('myRole') || 'civilian';
-    setGameData((prev) => ({ ...prev, initialCode: code, players }));
+    // absolute deadline measured from receive time — the countdown stays in
+    // sync with the server timer no matter when GameScreen mounts
+    const endsAt = Date.now() + (duration ?? 0) * 1000;
+    setGameData((prev) => ({ ...prev, initialCode: code, players, endsAt, voting: false }));
     setRoleReveal({ role });
     setScreen('role');
-    setTimeout(() => {
+    clearTimeout(revealTimerRef.current);
+    revealTimerRef.current = setTimeout(() => {
       setRoleReveal(null);
       setScreen('game');
     }, 3000);
   }
 
-  function handleVoteResult(result) {
-    setResultData({ ...result, players: gameData?.players });
-    setScreen('result');
-  }
-
   function handlePlayAgain() {
+    socket.emit('leave_lobby');
     sessionStorage.removeItem('myRole');
     setScreen('lobby');
     setGameData(null);
@@ -50,7 +61,7 @@ export default function App() {
   if (screen === 'role' && roleReveal) {
     const isImposter = roleReveal.role === 'imposter';
     return (
-      <div className="screen" style={{ textAlign: 'center' }}>
+      <div className="screen sky-screen sky-dusk" style={{ textAlign: 'center' }}>
         <div className="pixel-panel" style={{ maxWidth: '400px', padding: '40px' }}>
           <p style={{ fontSize: '8px', color: '#888', marginBottom: '24px' }}>YOUR ROLE IS...</p>
           <h1 className="bounce" style={{ fontFamily: 'Press Start 2P', fontSize: '22px', color: isImposter ? '#FF4444' : '#44CC44' }}>
@@ -71,7 +82,6 @@ export default function App() {
         <WaitingRoom
           roomCode={gameData.roomCode}
           players={gameData.players}
-          isHost={gameData.isHost}
           myId={gameData.myId}
           onGameStart={handleGameStart}
         />
@@ -82,11 +92,8 @@ export default function App() {
           initialCode={gameData.initialCode}
           players={gameData.players}
           myId={gameData.myId}
-          onVoteResult={handleVoteResult}
-          onGameOver={(data) => {
-            setResultData({ ...data, players: gameData.players });
-            setScreen('result');
-          }}
+          endsAt={gameData.endsAt}
+          voting={!!gameData.voting}
         />
       )}
       {screen === 'result' && resultData && (
@@ -94,6 +101,7 @@ export default function App() {
           winner={resultData.winner}
           imposter={resultData.imposter}
           players={resultData.players}
+          tie={resultData.tie}
           onPlayAgain={handlePlayAgain}
         />
       )}

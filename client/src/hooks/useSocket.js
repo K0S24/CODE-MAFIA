@@ -18,14 +18,16 @@ export function useSocket(eventHandlers) {
   handlersRef.current = eventHandlers;
 
   useEffect(() => {
-    const handlers = handlersRef.current;
-    Object.entries(handlers).forEach(([event, handler]) => {
-      socket.on(event, handler);
+    // Register stable wrappers that dereference the CURRENT handler at call
+    // time — otherwise every handler would be a stale closure from the
+    // first render (the event names must not change between renders).
+    const wrappers = Object.keys(handlersRef.current).map((event) => {
+      const wrapper = (...args) => handlersRef.current[event]?.(...args);
+      socket.on(event, wrapper);
+      return [event, wrapper];
     });
     return () => {
-      Object.entries(handlers).forEach(([event, handler]) => {
-        socket.off(event, handler);
-      });
+      wrappers.forEach(([event, wrapper]) => socket.off(event, wrapper));
     };
   }, [socket]);
 

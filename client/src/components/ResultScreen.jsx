@@ -1,16 +1,30 @@
+import SkyBackdrop from './SkyBackdrop';
 import '../styles/pixel.css';
 
-export default function ResultScreen({ winner, imposter, players, onPlayAgain }) {
+export default function ResultScreen({ winner, imposter, players, tie, onPlayAgain }) {
   const imposterPlayer = players?.find((p) => p.id === imposter);
   const civiliansWon = winner === 'civilians';
 
   return (
-    <div className="screen">
-      <h1 className="pixel-title bounce" style={{ color: civiliansWon ? '#44CC44' : '#FF4444', marginBottom: '16px' }}>
+    <div className="screen sky-screen sky-night">
+      <SkyBackdrop
+        moon={{ top: '8%', right: '14%' }}
+        clouds={[
+          { w: 90, h: 30, top: '20%', drift: 44, delay: -10 },
+          { w: 64, h: 24, top: '36%', drift: 56, delay: -30 },
+        ]}
+        sparkles={[
+          { top: '15%', left: '18%' },
+          { top: '28%', left: '40%', animationDelay: '-1.1s' },
+          { top: '12%', left: '60%', animationDelay: '-0.5s' },
+          { top: '34%', right: '8%', animationDelay: '-1.7s' },
+        ]}
+      />
+      <h1 className="pixel-title pixel-title-3d bounce" style={{ color: civiliansWon ? '#44CC44' : '#FF4444', marginBottom: '16px' }}>
         {civiliansWon ? 'CIVILIANS WIN!' : 'IMPOSTER WINS!'}
       </h1>
-      <p style={{ fontSize: '8px', color: '#888', marginBottom: '32px' }}>
-        {civiliansWon ? 'THE IMPOSTER WAS CAUGHT!' : 'THE IMPOSTER ESCAPED!'}
+      <p style={{ fontSize: '8px', color: '#aab0d8', marginBottom: '32px', textShadow: '2px 2px 0 #000' }}>
+        {civiliansWon ? 'THE IMPOSTER WAS CAUGHT!' : tie ? 'THE VOTE WAS TIED!' : 'THE IMPOSTER ESCAPED!'}
       </p>
 
       {imposterPlayer && (

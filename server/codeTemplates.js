@@ -3,8 +3,8 @@ const templates = [
 def calculate_sum(numbers):
     total = 0
     for n in numbers:
-        total += n
-    return total  # BUG: return wrong value
+        total = n  # BUG: overwrites instead of adding
+    return total
 
 # TASK 2: Complete the function that checks if a number is prime
 def is_prime(n):
@@ -87,9 +87,9 @@ def fibonacci(n):
     if n == 1:
         return [0]
     seq = [0, 1]
-    for i in range(2, n):
+    for i in range(2, n - 1):  # BUG: off-by-one, drops the last element
         seq.append(seq[-1] + seq[-2])
-    return seq  # BUG: off-by-one, should include n elements
+    return seq
 
 # TASK 2: Complete the Caesar cipher
 def caesar_cipher(text, shift):
@@ -142,15 +142,15 @@ def find_pairs(lst, target):
 # TASK 3: Fix the string truncator
 def truncate(s, max_len):
     if len(s) > max_len:
-        return s[:max_len] + "..."
-    return s  # BUG: adds "..." even when not needed — already correct here, fix task 1`,
+        return s + "..."  # BUG: forgets to cut the string to max_len
+    return s`,
 
   `# TASK 1: Fix the list rotation
 def rotate_left(lst, k):
     if not lst:
         return lst
     k = k % len(lst)
-    return lst[k:] + lst[:k]  # BUG: rotates right instead of left — swap slices
+    return lst[:k] + lst[k:]  # BUG: slices are in the wrong order — this returns the list unchanged
 
 # TASK 2: Complete the function that checks balanced brackets
 def is_balanced(s):

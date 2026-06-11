@@ -88,27 +88,209 @@ body {
   background-color: var(--pixel-bg);
 }
 
-/* Outdoor sky scene */
-.outdoor-screen {
-  background: #4488DD;
+/* ===== Pixel sky system — banded gradients with dithered transitions ===== */
+/* Time of day follows the game: sunset (lobby) -> dusk (voting) -> night (result) */
+.sky-screen {
   position: relative;
   overflow: hidden;
 }
 
-.outdoor-screen::after {
+.sky-screen::before,
+.sky-screen::after {
   content: '';
   position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 48px;
-  background: #33AA44;
-  z-index: 1;
+  pointer-events: none;
+  z-index: 0;
 }
 
-.outdoor-screen > * {
+/* subtle full-screen dither grain */
+.sky-screen::before {
+  inset: 0;
+  background-image: repeating-conic-gradient(var(--sky-grain, rgba(0, 0, 0, 0.06)) 0% 25%, transparent 0% 50%);
+  background-size: 8px 8px;
+}
+
+/* twinkling star field (one 4px dot cloned via box-shadow) */
+.sky-screen::after {
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 4px;
+  background: transparent;
+  box-shadow:
+    7vw 9vh #fff, 16vw 22vh #fff, 24vw 6vh #fff, 33vw 16vh #fff,
+    41vw 9vh #fff, 52vw 13vh #fff, 61vw 5vh #fff, 70vw 18vh #fff,
+    78vw 8vh #fff, 87vw 14vh #fff, 93vw 24vh #fff, 12vw 33vh #fff,
+    27vw 29vh #fff, 47vw 27vh #fff, 58vw 31vh #fff, 73vw 28vh #fff,
+    85vw 35vh #fff, 5vw 46vh #fff, 20vw 43vh #fff, 38vw 41vh #fff,
+    55vw 44vh #fff, 68vw 40vh #fff, 90vw 47vh #fff, 30vw 55vh #fff,
+    50vw 58vh #fff, 75vw 54vh #fff, 10vw 60vh #fff, 63vw 63vh #fff,
+    84vw 66vh #fff, 22vw 68vh #fff;
+  opacity: var(--star-glow, 0.8);
+  animation: star-twinkle 3.2s steps(1, end) infinite;
+}
+
+.sky-screen > * {
   position: relative;
   z-index: 2;
+}
+
+/* --- sunset: warm launch-week sky (lobby + waiting room) --- */
+.sky-sunset {
+  --sky-grain: rgba(58, 18, 84, 0.07);
+  --star-glow: 0.75;
+  background-color: #471670;
+  background-image:
+    repeating-conic-gradient(#471670 0% 25%, transparent 0% 50%),
+    repeating-conic-gradient(#79209b 0% 25%, transparent 0% 50%),
+    repeating-conic-gradient(#b62d92 0% 25%, transparent 0% 50%),
+    repeating-conic-gradient(#ec5a78 0% 25%, transparent 0% 50%),
+    repeating-conic-gradient(#ff8e5b 0% 25%, transparent 0% 50%),
+    repeating-conic-gradient(#ffbf72 0% 25%, transparent 0% 50%),
+    linear-gradient(180deg,
+      #471670 0%, #471670 13%,
+      #79209b 13%, #79209b 26%,
+      #b62d92 26%, #b62d92 39%,
+      #ec5a78 39%, #ec5a78 52%,
+      #ff8e5b 52%, #ff8e5b 65%,
+      #ffbf72 65%, #ffbf72 80%,
+      #ffe8c2 80%, #ffe8c2 100%);
+  background-size: 16px 16px, 16px 16px, 16px 16px, 16px 16px, 16px 16px, 16px 16px, 100% 100%;
+  background-repeat: repeat-x, repeat-x, repeat-x, repeat-x, repeat-x, repeat-x, no-repeat;
+  /* percentage position resolves against (height - 16px), so each strip
+     needs +0.16px per percent to sit exactly on its band boundary */
+  background-position: 0 calc(13% + 2.08px), 0 calc(26% + 4.16px), 0 calc(39% + 6.24px), 0 calc(52% + 8.32px), 0 calc(65% + 10.4px), 0 calc(80% + 12.8px), 0 0;
+}
+
+/* --- dusk: tense red twilight (role reveal + voting) --- */
+.sky-dusk {
+  --sky-grain: rgba(0, 0, 0, 0.1);
+  --star-glow: 0.9;
+  --cloud: #c9a4e6;
+  --cloud-shade: #9a6fc4;
+  background-color: #120b30;
+  background-image:
+    repeating-conic-gradient(#120b30 0% 25%, transparent 0% 50%),
+    repeating-conic-gradient(#261048 0% 25%, transparent 0% 50%),
+    repeating-conic-gradient(#41145a 0% 25%, transparent 0% 50%),
+    repeating-conic-gradient(#63185b 0% 25%, transparent 0% 50%),
+    repeating-conic-gradient(#8a2046 0% 25%, transparent 0% 50%),
+    repeating-conic-gradient(#ab3a31 0% 25%, transparent 0% 50%),
+    linear-gradient(180deg,
+      #120b30 0%, #120b30 18%,
+      #261048 18%, #261048 34%,
+      #41145a 34%, #41145a 50%,
+      #63185b 50%, #63185b 64%,
+      #8a2046 64%, #8a2046 76%,
+      #ab3a31 76%, #ab3a31 87%,
+      #b8512b 87%, #b8512b 100%);
+  background-size: 16px 16px, 16px 16px, 16px 16px, 16px 16px, 16px 16px, 16px 16px, 100% 100%;
+  background-repeat: repeat-x, repeat-x, repeat-x, repeat-x, repeat-x, repeat-x, no-repeat;
+  background-position: 0 calc(18% + 2.88px), 0 calc(34% + 5.44px), 0 calc(50% + 8px), 0 calc(64% + 10.24px), 0 calc(76% + 12.16px), 0 calc(87% + 13.92px), 0 0;
+}
+
+/* --- night: the verdict is in (result screen) --- */
+.sky-night {
+  --sky-grain: rgba(255, 255, 255, 0.03);
+  --star-glow: 1;
+  --cloud: #39406e;
+  --cloud-shade: #272d52;
+  background-color: #04040f;
+  background-image:
+    repeating-conic-gradient(#04040f 0% 25%, transparent 0% 50%),
+    repeating-conic-gradient(#0a0a23 0% 25%, transparent 0% 50%),
+    repeating-conic-gradient(#101232 0% 25%, transparent 0% 50%),
+    repeating-conic-gradient(#171c42 0% 25%, transparent 0% 50%),
+    repeating-conic-gradient(#1f2752 0% 25%, transparent 0% 50%),
+    linear-gradient(180deg,
+      #04040f 0%, #04040f 22%,
+      #0a0a23 22%, #0a0a23 40%,
+      #101232 40%, #101232 56%,
+      #171c42 56%, #171c42 70%,
+      #1f2752 70%, #1f2752 83%,
+      #283360 83%, #283360 100%);
+  background-size: 16px 16px, 16px 16px, 16px 16px, 16px 16px, 16px 16px, 100% 100%;
+  background-repeat: repeat-x, repeat-x, repeat-x, repeat-x, repeat-x, no-repeat;
+  background-position: 0 calc(22% + 3.52px), 0 calc(40% + 6.4px), 0 calc(56% + 8.96px), 0 calc(70% + 11.2px), 0 calc(83% + 13.28px), 0 0;
+}
+
+/* plus-shaped sparkle (5 squares) */
+.pixel-sparkle {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background: #fff;
+  box-shadow: 0 -6px #fff, 0 6px #fff, -6px 0 #fff, 6px 0 #fff;
+  animation: sparkle-pop 2.4s steps(2, end) infinite;
+  pointer-events: none;
+}
+
+/* stairstepped pixel moon */
+.pixel-moon {
+  position: absolute;
+  width: 96px;
+  height: 96px;
+  background: #fff7dd;
+  clip-path: polygon(
+    31.25% 0%, 68.75% 0%, 68.75% 6.25%, 81.25% 6.25%, 81.25% 12.5%, 87.5% 12.5%,
+    87.5% 18.75%, 93.75% 18.75%, 93.75% 31.25%, 100% 31.25%, 100% 68.75%,
+    93.75% 68.75%, 93.75% 81.25%, 87.5% 81.25%, 87.5% 87.5%, 81.25% 87.5%,
+    81.25% 93.75%, 68.75% 93.75%, 68.75% 100%, 31.25% 100%, 31.25% 93.75%,
+    18.75% 93.75%, 18.75% 87.5%, 12.5% 87.5%, 12.5% 81.25%, 6.25% 81.25%,
+    6.25% 68.75%, 0% 68.75%, 0% 31.25%, 6.25% 31.25%, 6.25% 18.75%, 12.5% 18.75%,
+    12.5% 12.5%, 18.75% 12.5%, 18.75% 6.25%, 31.25% 6.25%
+  );
+  pointer-events: none;
+}
+
+.pixel-moon::before {
+  content: '';
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  left: 22%;
+  top: 30%;
+  background: #ecd9a8;
+  box-shadow: 28px 30px 0 #ecd9a8;
+}
+
+.pixel-moon::after {
+  content: '';
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  right: 22%;
+  top: 22%;
+  background: #ecd9a8;
+}
+
+/* chunky 3D block title (launch-week style, pure text-shadow) */
+.pixel-title-3d {
+  --t3d-side: #2c2150;
+  --t3d-side-dark: #191238;
+  --t3d-ink: #0d0a1f;
+  color: #fff;
+  letter-spacing: 6px;
+  line-height: 1.4;
+  text-shadow:
+    -3px 0 var(--t3d-ink), 3px 0 var(--t3d-ink), 0 -3px var(--t3d-ink), 0 3px var(--t3d-ink),
+    -2px -2px var(--t3d-ink), 2px -2px var(--t3d-ink), -2px 2px var(--t3d-ink), 2px 2px var(--t3d-ink),
+    3px 3px var(--t3d-side), 5px 5px var(--t3d-side),
+    7px 7px var(--t3d-side-dark), 9px 9px var(--t3d-side-dark),
+    13px 13px 0 rgba(0, 0, 0, 0.35);
+}
+
+.pixel-title-3d-purple {
+  --t3d-side: #8a5fc9;
+  --t3d-side-dark: #50338c;
+  --t3d-ink: #240f3e;
+}
+
+.pixel-title-3d-red {
+  color: #ff5d5d;
+  --t3d-side: #7e1d2c;
+  --t3d-side-dark: #4a0f1a;
+  --t3d-ink: #1c060c;
 }
 
 .sky-clouds {
@@ -120,7 +302,8 @@ body {
 
 .pixel-cloud {
   position: absolute;
-  background: #f4f4f4;
+  background: var(--cloud, #ffffff);
+  box-shadow: inset 0 -6px 0 var(--cloud-shade, #bcd9f7);
   image-rendering: pixelated;
 }
 
@@ -128,7 +311,7 @@ body {
 .pixel-cloud::after {
   content: '';
   position: absolute;
-  background: #f4f4f4;
+  background: var(--cloud, #ffffff);
 }
 
 .pixel-cloud::before {
@@ -160,5 +343,29 @@ body {
   50%       { opacity: 0; }
 }
 
+@keyframes star-twinkle {
+  0%, 100% { opacity: var(--star-glow, 0.8); }
+  50%      { opacity: 0.35; }
+}
+
+@keyframes sparkle-pop {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50%      { transform: scale(0.4); opacity: 0.4; }
+}
+
 .bounce { animation: bounce 0.6s ease infinite; }
 .blink  { animation: blink 1s step-end infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .pixel-sparkle,
+  .sky-screen::after,
+  .bounce {
+    animation: none !important;
+  }
+  /* clouds get their x-position from the drift animation's transform —
+     pausing (with their negative delays) freezes them scattered across
+     the sky instead of collapsing them all to the left edge */
+  .pixel-cloud {
+    animation-play-state: paused !important;
+  }
+}

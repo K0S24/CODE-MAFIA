@@ -23,7 +23,8 @@ function joinLobby(socketId, username, roomCode) {
   if (!lobby) return { success: false, message: 'Lobby not found' };
   if (lobby.players.length >= 5) return { success: false, message: 'Lobby is full' };
 
-  const color = PLAYER_COLORS[lobby.players.length];
+  const used = lobby.players.map((p) => p.color);
+  const color = PLAYER_COLORS.find((c) => !used.includes(c)) || PLAYER_COLORS[0];
   const player = { id: socketId, username, color, isHost: false, role: null };
   lobby.players.push(player);
   return { success: true, players: lobby.players };
@@ -37,13 +38,13 @@ function removePlayer(socketId) {
       lobby.players.splice(index, 1);
       if (lobby.players.length === 0) {
         delete lobbies[code];
-        return null;
+        return { roomCode: code, players: [], empty: true };
       }
-      if (lobby.hostId === socketId && lobby.players.length > 0) {
+      if (lobby.hostId === socketId) {
         lobby.players[0].isHost = true;
         lobby.hostId = lobby.players[0].id;
       }
-      return { roomCode: code, players: lobby.players };
+      return { roomCode: code, players: lobby.players, empty: false };
     }
   }
   return null;

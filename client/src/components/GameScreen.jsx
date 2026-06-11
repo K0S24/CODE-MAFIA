@@ -4,46 +4,46 @@ import CodeEditor from './CodeEditor';
 import ChatBox from './ChatBox';
 import VotingScreen from './VotingScreen';
 
-const GAME_DURATION = 180;
+function secondsLeft(endsAt) {
+  return endsAt ? Math.max(0, Math.ceil((endsAt - Date.now()) / 1000)) : 0;
+}
 
-export default function GameScreen({ roomCode, initialCode, players, myId, onVoteResult, onGameOver }) {
+export default function GameScreen({ roomCode, initialCode, players, myId, endsAt, voting }) {
   const [code, setCode] = useState(initialCode);
-  const [timeLeft, setTimeLeft] = useState(GAME_DURATION);
-  const [showVoting, setShowVoting] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(() => secondsLeft(endsAt));
 
   const [playerCursors, setPlayerCursors] = useState({});
 
   const socket = useSocket({
     code_update: ({ code: newCode }) => setCode(newCode),
     cursor_update: ({ userId, line }) => setPlayerCursors((prev) => ({ ...prev, [userId]: line })),
-    vote_result: (result) => onVoteResult(result),
-    game_over: (data) => onGameOver(data),
   });
 
   useEffect(() => {
+    // display only — the server decides when voting starts; counting against
+    // the absolute deadline keeps the clock honest however late we mounted
     const interval = setInterval(() => {
-      setTimeLeft((t) => {
-        if (t <= 1) { clearInterval(interval); setShowVoting(true); return 0; }
-        return t - 1;
-      });
-    }, 1000);
+      const next = secondsLeft(endsAt);
+      setTimeLeft(next);
+      if (next <= 0) clearInterval(interval);
+    }, 500);
     return () => clearInterval(interval);
-  }, []);
+  }, [endsAt]);
 
   function handleCodeChange(newCode) {
     setCode(newCode);
-    socket.emit('code_change', { roomCode, code: newCode, userId: myId });
+    socket.emit('code_change', { roomCode, code: newCode });
   }
 
   function handleCursorChange(line) {
-    socket.emit('cursor_move', { roomCode, userId: myId, line });
+    socket.emit('cursor_move', { roomCode, line });
   }
 
   const myRole = sessionStorage.getItem('myRole') || 'civilian';
   const minutes = Math.floor(timeLeft / 60);
   const seconds = timeLeft % 60;
 
-  if (showVoting) {
+  if (voting) {
     return <VotingScreen roomCode={roomCode} players={players} myId={myId} />;
   }
 
@@ -56,7 +56,7 @@ export default function GameScreen({ roomCode, initialCode, players, myId, onVot
         <span style={{ color: timeLeft <= 30 ? 'red' : '#FFCC00', marginLeft: 'auto' }}>
           {String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}
         </span>
-        <button onClick={() => setShowVoting(true)} style={{ padding: '6px 12px', background: 'red', color: '#fff', border: 'none', cursor: 'pointer' }}>
+        <button onClick={() => socket.emit('call_vote', { roomCode })} style={{ padding: '6px 12px', background: 'red', color: '#fff', border: 'none', cursor: 'pointer' }}>
           CALL VOTE
         </button>
       </div>

@@ -18,7 +18,7 @@ export default function ChatBox({ roomCode, myId }) {
 
   function sendMessage() {
     if (!input.trim()) return;
-    socket.emit('chat_message', { roomCode, userId: myId, message: input.trim() });
+    socket.emit('chat_message', { roomCode, message: input.trim() });
     setInput('');
   }
 
